@@ -5,6 +5,7 @@
     "keywords": ["framework", "laravel"],
     "license": "MIT",
     "require": {
+        "ext-pdo_sqlite": "*",
         "php": "^7.3|^8.0",
         "botman/botman": "^2.6",
         "botman/driver-telegram": "^1.6",

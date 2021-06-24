@@ -69,7 +69,7 @@ Click \"Join Airdrop\" to proceed\"
             ",
             '📘 Submit my details' => "
 \u{1f539} Join our telegram group and channel
-(button)[;-) Done]",
+(button)[:wink: Done]",
             ':wink: Done' => "\u{1f539} Follow us on Twitter, like and retweet pinned message
 
             Submit your Twitter profile link (Example: https://www.twitter.com/yourusername)',

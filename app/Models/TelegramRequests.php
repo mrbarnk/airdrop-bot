@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class TelegramRequests extends Model
 {
-    protected $fillables = ['user_id', 'request'];
-    
+    protected $fillable = ['user_id', 'request'];
+
     use HasFactory;
 }

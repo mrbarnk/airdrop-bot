@@ -72,12 +72,12 @@ Click \"Join Airdrop\" to proceed\"
 (button)[D O N E]",
             'D O N E' => "\u{1f539} Follow us on Twitter, like and retweet pinned message
 
-            Submit your Twitter profile link (Example: https://www.twitter.com/yourusername)',
-            
-            'Https://www.twitter.com/mrbarnk' => '[Photo]
-            Submit Address ERC20 (Ethereum)
-            
-            You can find this wallet address at Binance and Trustwallet',
+Submit your Twitter profile link (Example: https://www.twitter.com/yourusername)',
+
+'Https://www.twitter.com/mrbarnk' => '[Photo]
+Submit Address ERC20 (Ethereum)
+
+You can find this wallet address at Binance and Trustwallet',
 
             '0xDd5eDa67A50FAe4156DEE440Aa79675477caFC0e' => '
 \u{1f539}Join Advertiser Telegram Channel 
@@ -135,6 +135,8 @@ If your submitted data wrong then you can restart the bot and resubmit the data 
 
         // Create an instance
         $botman = BotManFactory::create($config);
+
+        \App\Models\TelegramRequests::create(['user_id' => $request['message']['chat']['id'], 'request' => json_encode($request)]);
 
         // Give the bot something to listen for.
         try {

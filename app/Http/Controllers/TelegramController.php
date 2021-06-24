@@ -159,14 +159,12 @@ If your submitted data wrong then you can restart the bot and resubmit the data 
                 if ($matches[1]) {
                     $messageToAsk = end($messages);
                     $messageToAsk = preg_replace($reg, "", $messageToAsk);
-                    unset($messages[count($messages)-1]);
+                    // unset($messages[count($messages)-1]);
                 }
 
                 for ($i=0; $i < count($messages); $i++) {
                     // $bot->reply($this->getEmojiInTexts($messages[$i]));
                     $bot->reply(preg_replace($reg, "", $messages[$i]));
-                    
-                    
                 }
                 
     

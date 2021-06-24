@@ -67,10 +67,10 @@ Click \"Join Airdrop\" to proceed\"
 
 (button)[\u{1f4d8} Submit my details]
             ",
-            'Submit my details' => "
+            '📘 Submit my details' => "
 \u{1f539} Join our telegram group and channel
-: Done",
-            'done' => "\u{1f539} Follow us on Twitter, like and retweet pinned message
+(button)[;-) Done]",
+            ':wink: Done' => "\u{1f539} Follow us on Twitter, like and retweet pinned message
 
             Submit your Twitter profile link (Example: https://www.twitter.com/yourusername)',
             
@@ -150,6 +150,18 @@ If your submitted data wrong then you can restart the bot and resubmit the data 
     
                 $messages = explode('---', $messages);
                 $reg = '/\(button\)\[(.*)]/m';
+
+                preg_match_all($reg, $this->messages[$request['message']['text']], $matches);
+                
+                $messageToAsk = "test";
+                $keyboard = [$matches[1]];
+
+                if ($matches[1]) {
+                    $messageToAsk = end($messages);
+                    $messageToAsk = preg_replace($reg, "", $messageToAsk);
+                    unset($messages[count($messages)-1]);
+                }
+
                 for ($i=0; $i < count($messages); $i++) {
                     // $bot->reply($this->getEmojiInTexts($messages[$i]));
                     $bot->reply(preg_replace($reg, "", $messages[$i]));
@@ -157,29 +169,19 @@ If your submitted data wrong then you can restart the bot and resubmit the data 
                     
                 }
                 
+    
                 
-                // $str = "(button)[:blue_book: Submit my details]
-    
-                // (button)[:blue_book: Submit my details2]";//$messages[$i];
-    
-    
-                preg_match_all($reg, $this->messages[$request['message']['text']], $matches);
-                
-                // for ($i=0; $i < count($matches[0]); $i++) { 
-                //     # code...
-                // }
-    
-                $keyboard = [$matches[1]];
-                
-                $bot->ask('*',
-                    function (Answer $answer) {
-                        $bot->askAdress();
-                    }, ['reply_markup' => json_encode([
-                        'keyboard' => $keyboard,
-                        'one_time_keyboard' => true,
-                        'resize_keyboard' => true
-                    ])]
-                );
+                if (!$messageToAsk != 'test') {
+                    $bot->ask($messageToAsk,
+                        function (Answer $answer) {
+                            $bot->askAdress();
+                        }, ['reply_markup' => json_encode([
+                            'keyboard' => $keyboard,
+                            'one_time_keyboard' => true,
+                            'resize_keyboard' => true
+                        ])]
+                    );
+                }
             });
         } catch (\Throwable $th) {
             //throw $th;

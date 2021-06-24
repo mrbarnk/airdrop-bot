@@ -19,3 +19,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::match(['get', 'post'], '/botman', '\App\Http\Controllers\TelegramController@handle');
+Route::get('/debug', function () {
+    // preg_match('/^;-) Done ?$/m...', ';-) Done', $matched);
+    // return json_encode($matched);
+});

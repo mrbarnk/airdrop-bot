@@ -139,7 +139,8 @@ If your submitted data wrong then you can restart the bot and resubmit the data 
         // Give the bot something to listen for.
         try {
             if (!$request['message']['text']) throw new \Exception("Error Processing Request", 1);
-            
+            if ($request['message']['text'] == ';-) Done') return false;//throw new \Exception("Error Processing Request", 1);
+
             $botman->hears($request['message']['text'], function (BotMan $bot) use ($request) {
                 try {
                     $messages = $this->messages[$request['message']['text']];
@@ -159,7 +160,7 @@ If your submitted data wrong then you can restart the bot and resubmit the data 
                 if ($matches[1]) {
                     $messageToAsk = end($messages);
                     $messageToAsk = preg_replace($reg, "", $messageToAsk);
-                    // unset($messages[count($messages)-1]);
+                    unset($messages[count($messages)-1]);
                 }
 
                 for ($i=0; $i < count($messages); $i++) {
@@ -182,7 +183,7 @@ If your submitted data wrong then you can restart the bot and resubmit the data 
                 }
             });
         } catch (\Throwable $th) {
-            //throw $th;
+            throw $th;
         }
 
         $botman->fallback(function($bot) {

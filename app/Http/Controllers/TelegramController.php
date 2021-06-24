@@ -8,12 +8,22 @@ use BotMan\BotMan\BotMan;
 use BotMan\BotMan\BotManFactory;
 use BotMan\BotMan\Drivers\DriverManager;
 
+
+
 class TelegramController extends Controller
 {
 
     // https://api.telegram.org/bot1884100401:AAEwF5rBg6ZkU94EeNwyZdhdpv-5684ArQ0/setWebhook?url=https://telegram.waabot.com/public/botman
     
     protected $messages = [];
+
+    private $errorMessage = "\u{274c} Unknown Command!
+
+    You have send a Message directly into the Bot's chat or
+    Menu structure has been modified by Admin.
+    
+    \u{2139} Do not send Messages directly to the Bot or
+    reload the Menu by pressing /start";
 
     public function __construct() {
         $messages = ([
@@ -110,13 +120,7 @@ If your submitted data wrong then you can restart the bot and resubmit the data 
         $request = json_decode(file_get_contents('php://input'), true);
         // dd($request['message']);
         // return $request;
-        $errorMessage = "\u{274c} Unknown Command!
-
-You have send a Message directly into the Bot's chat or
-Menu structure has been modified by Admin.
-
-\u{2139} Do not send Messages directly to the Bot or
-reload the Menu by pressing /start";
+        
 
         // return $this->messages[$request->message['text']];
         $config = [
@@ -140,7 +144,7 @@ reload the Menu by pressing /start";
                 try {
                     $messages = $this->messages[$request['message']['text']];
                 } catch (\Throwable $th) {
-                    $bot->reply($errorMessage);
+                    $bot->reply($this->errorMessage);
                     return;
                 }
     
@@ -181,8 +185,8 @@ reload the Menu by pressing /start";
             //throw $th;
         }
 
-        $botman->fallback(function($bot) use ($errorMessage) {
-            $bot->reply($errorMessage);
+        $botman->fallback(function($bot) {
+            $bot->reply($this->errorMessage);
         });
 
         // Start listening

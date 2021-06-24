@@ -171,7 +171,7 @@ If your submitted data wrong then you can restart the bot and resubmit the data 
                 
     
                 
-                if (!$messageToAsk != 'test') {
+                if ($messageToAsk != 'test') {
                     $bot->ask($messageToAsk,
                         function (Answer $answer) {
                             $bot->askAdress();

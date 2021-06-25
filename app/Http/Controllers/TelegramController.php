@@ -247,6 +247,8 @@ ________________
                 $bot->reply($this->errorMessage);
                 return;
             }
+        } else {
+            $bot->reply($this->errorMessage);
         }
     }
     public function updateTwitterProfileUrl($request, $url)

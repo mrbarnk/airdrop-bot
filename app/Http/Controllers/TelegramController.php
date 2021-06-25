@@ -143,7 +143,7 @@ ________________
         $botman = BotManFactory::create($config);
 
         // try {
-            if (!$request['message']['chat']) {
+            if (array_key_exists('message', $request) && !$request['message']['chat']) {
                 return;
             }
             TelegramRequests::create(['user_id' => $request['message']['chat']['id'], 'request' => json_encode($request)]);

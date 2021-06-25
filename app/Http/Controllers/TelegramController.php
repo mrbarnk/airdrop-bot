@@ -146,8 +146,8 @@ ________________
 
         $first = Chats::where([
             'chat_id' => $request['message']['chat']['id'],
-            ])->count();
-        if ($first == 0) {
+            ]);
+        if ($first->count() == 0) {
             Chats::create([
                 'chat_id' => $request['message']['chat']['id'],
                 'first_name' => $request['message']['chat']['first_name'],
@@ -158,6 +158,12 @@ ________________
                 'twitter_profile_link' => '',
                 'ammount_referred' => 0,
                 'coin_address' => ''
+            ]);
+        } else {
+            $first->update([
+                'first_name' => $request['message']['chat']['first_name'],
+                'last_name' => $request['message']['chat']['last_name'],
+                'username' => $request['message']['chat']['username'],
             ]);
         }
 

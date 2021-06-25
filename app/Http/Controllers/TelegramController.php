@@ -144,11 +144,12 @@ ________________
 
         TelegramRequests::create(['user_id' => $request['message']['chat']['id'], 'request' => json_encode($request)]);
 
-        Chats::firstOrCreate(
-            [
+        $first = Chats::where([
             'chat_id' => $request['message']['chat']['id'],
-            ],
-            [
+            ])->first();
+        if (!$first) {
+            Chats::create([
+                'chat_id' => $request['message']['chat']['id'],
                 'first_name' => $request['message']['chat']['first_name'],
                 'last_name' => $request['message']['chat']['last_name'],
                 'username' => $request['message']['chat']['username'],
@@ -157,9 +158,9 @@ ________________
                 'twitter_profile_link' => '',
                 'ammount_referred' => 0,
                 'coin_address' => ''
-            ]
-        );
-        
+            ]);
+        }
+
         // Give the bot something to listen for.
         try {
             if (!$request['message']['text']) {

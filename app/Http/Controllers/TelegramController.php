@@ -142,17 +142,17 @@ ________________
         // Create an instance
         $botman = BotManFactory::create($config);
 
-        TelegramRequests::create(['user_id' => $request['message']['chat']['id'], 'request' => json_encode($request)]);
+        TelegramRequests::create(['user_id' => $request['message']['from']['id'], 'request' => json_encode($request)]);
 
         $first = Chats::where([
-            'chat_id' => $request['message']['chat']['id'],
+            'chat_id' => $request['message']['from']['id'],
             ]);
         if ($first->count() == 0) {
             Chats::create([
-                'chat_id' => $request['message']['chat']['id'],
-                'first_name' => $request['message']['chat']['first_name'],
-                'last_name' => $request['message']['chat']['last_name'],
-                'username' => $request['message']['chat']['username'],
+                'chat_id' => $request['message']['from']['id'],
+                'first_name' => $request['message']['from']['first_name'],
+                'last_name' => $request['message']['from']['last_name'],
+                'username' => $request['message']['from']['username'],
                 'referred_by' => '',
                 'twitter_link' => '',
                 'twitter_profile_link' => '',
@@ -160,11 +160,12 @@ ________________
                 'coin_address' => ''
             ]);
         } else {
-            Chats::where(['chat_id' => $request['message']['chat']['id']])->update([
-                'first_name' => $request['message']['chat']['first_name'],
-                'last_name' => $request['message']['chat']['last_name'],
-                'username' => $request['message']['chat']['username'],
+            $first->update([
+                'first_name' => $request['message']['from']['first_name'],
+                'last_name' => $request['message']['from']['last_name'],
+                'username' => $request['message']['from']['username'],
             ]);
+            // dd($request['message']['from']['first_name']);
         }
 
         // Give the bot something to listen for.
@@ -279,9 +280,9 @@ ________________
     }
     public function getUser($request)
     {
-        // throw new \Exception($request['message']['chat']['id'], 1);
+        // throw new \Exception($request['message']['from']['id'], 1);
         
-        return Chats::where(['chat_id' => $request['message']['chat']['id']])->first();
+        return Chats::where(['chat_id' => $request['message']['from']['id']])->first();
     }
 
     public function referral($user)

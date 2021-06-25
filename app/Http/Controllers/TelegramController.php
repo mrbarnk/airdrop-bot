@@ -27,8 +27,8 @@ class TelegramController extends Controller
 
     public function __construct()
     {
-        $welcomeMsg = "Welcome
-        Reply with (button)[/start]";
+        $welcomeMsg = "😇 Welcome
+Reply with <b>/start</b>. (button)[/start]";
         $messages = ([
             'hi' => $welcomeMsg,
             'Hi' => $welcomeMsg,
@@ -379,12 +379,14 @@ ________________
                 function (Answer $answer) {
                     $bot->askAdress();
                 },
-                ['reply_markup' => json_encode([
-                            'keyboard' => $keyboard,
-                            'one_time_keyboard' => true,
-                            'resize_keyboard' => true
-                        ])]
-            );
+                [
+                    'reply_markup' => json_encode([
+                    'keyboard' => $keyboard,
+                    'one_time_keyboard' => true,
+                    'resize_keyboard' => true
+                ]),
+                    'parse_mode' => 'HTML'
+                ]);
         }
     }
 }

@@ -142,13 +142,17 @@ ________________
         // Create an instance
         $botman = BotManFactory::create($config);
 
-        TelegramRequests::create(['user_id' => $request['message']['chat']['id'], 'request' => json_encode($request)]);
+        try {
+            if (!$request['message']['chat']) {
+                return;
+            }
+            TelegramRequests::create(['user_id' => $request['message']['chat']['id'], 'request' => json_encode($request)]);
 
-        $first = Chats::where([
+            $first = Chats::where([
             'chat_id' => $request['message']['chat']['id'],
             ]);
-        if ($first->count() == 0) {
-            Chats::create([
+            if ($first->count() == 0) {
+                Chats::create([
                 'chat_id' => $request['message']['chat']['id'],
                 'first_name' => $request['message']['chat']['first_name'],
                 'last_name' => $request['message']['chat']['last_name'],
@@ -159,15 +163,17 @@ ________________
                 'ammount_referred' => 0,
                 'coin_address' => ''
             ]);
-        } else {
-            Chats::where(['chat_id' => $request['message']['chat']['id']])->update([
+            } else {
+                Chats::where(['chat_id' => $request['message']['chat']['id']])->update([
                 'first_name' => $request['message']['chat']['first_name'],
                 'last_name' => $request['message']['chat']['last_name'],
                 'username' => $request['message']['chat']['username'],
             ]);
-            // dd($request['message']['chat']['first_name']);
+                // dd($request['message']['chat']['first_name']);
+            }
+        } catch (\Throwable $th) {
+            //throw $th;
         }
-
         // Give the bot something to listen for.
         try {
             if (!$request['message']['text']) {
@@ -266,7 +272,8 @@ ________________
     {
         return $this->getUser($request)->update(['twitter_link' => $url]);
     }
-    public function updateWalletAddress($request, $address) {
+    public function updateWalletAddress($request, $address)
+    {
         return $this->getUser($request)->update(['coin_address' => $address]);
     }
     public function updateReferral($chat_id, $request)
@@ -398,7 +405,8 @@ ________________
                     'resize_keyboard' => true
                 ]),
                     'parse_mode' => 'HTML'
-                ]);
+                ]
+            );
         }
     }
 }

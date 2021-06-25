@@ -232,7 +232,7 @@ If your submitted data wrong then you can restart the bot and resubmit the data 
                 } elseif (count($twitterLink) > 0) {
                     $messages = [$this->messages['twitted_link']];
                     $this->replyChat($messages, $bot, $user);
-                    $this->updateTwitterLinkUrl($request, $twitterLink);
+                    $this->updateTwitterLinkUrl($request, $twitterLink[0][0]);
                 } elseif ((new EthereumValidator)->isAddress($str)) {
                     $messages = [$this->messages['wallet_address']];
                     $this->replyChat($messages, $bot, $user);

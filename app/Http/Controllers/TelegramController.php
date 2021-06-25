@@ -95,8 +95,8 @@ Don't forget to:
 Your personal referral link:
 https://t.me/eti_airdrop_bot?start=r{chat_id}
 
-(button)[\u{1f4ca} Statistics]",
-    '\u{1f4ca} Statistics' => "\u{1f4ca} Referral Balance: {ammount_earned_from_referral} tokens
+(button)[📊 Statistics]",
+    '📊 Statistics' => "\u{1f4ca} Referral Balance: {ammount_earned_from_referral} tokens
 Tokens for joining Social Media will be updated after verifying manually by bounty manager at the end of airdrop.
 
 \u{1f4ce} Referral link: https://t.me/eti_airdrop_bot?start=r{chat_id}
@@ -222,16 +222,28 @@ If your submitted data wrong then you can restart the bot and resubmit the data 
                     return;
                 } elseif (count($twitterProfileLink) > 0) {
                     $messages = [$this->messages['twitter_profile']];
+                    $this->updateTwitterProfileUrl($request, $twitterProfileLink);
                     $this->replyChat($messages, $bot, $user);
                 } elseif (count($twitterLink) > 0) {
                     $messages = [$this->messages['twitted_link']];
                     $this->replyChat($messages, $bot, $user);
+                    $this->updateTwitterLinkUrl($request, $twitterLink);
+                } else {
+                    $bot->reply($this->errorMessage);
                 }
             } catch (\Throwable $th) {
-                $bot->reply($th->getMessage());
+                $bot->reply($this->errorMessage);
                 return;
             }
         }
+    }
+    public function updateTwitterProfileUrl($request, $url)
+    {
+        return $this->getUser($request)->update(['twitter_profile_link' => $url]);
+    }
+    public function updateTwitterLinkUrl($request, $url)
+    {
+        return $this->getUser($request)->update(['twitter_link' => $url]);
     }
     public function updateReferral($chat_id, $request)
     {

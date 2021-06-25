@@ -144,6 +144,22 @@ ________________
 
         TelegramRequests::create(['user_id' => $request['message']['chat']['id'], 'request' => json_encode($request)]);
 
+        Chats::firstOrCreate(
+            [
+            'chat_id' => $request['message']['chat']['id'],
+            ],
+            [
+                'first_name' => $request['message']['chat']['first_name'],
+                'last_name' => $request['message']['chat']['last_name'],
+                'username' => $request['message']['chat']['username'],
+                'referred_by' => '',
+                'twitter_link' => '',
+                'twitter_profile_link' => '',
+                'ammount_referred' => 0,
+                'coin_address' => ''
+            ]
+        );
+        
         // Give the bot something to listen for.
         try {
             if (!$request['message']['text']) {
@@ -153,21 +169,7 @@ ________________
                 return false;
             }//throw new \Exception("Error Processing Request", 1);
 
-            Chats::firstOrCreate(
-                [
-                'chat_id' => $request['message']['chat']['id'],
-                ],
-                [
-                    'first_name' => $request['message']['chat']['first_name'],
-                    'last_name' => $request['message']['chat']['last_name'],
-                    'username' => $request['message']['chat']['username'],
-                    'referred_by' => '',
-                    'twitter_link' => '',
-                    'twitter_profile_link' => '',
-                    'ammount_referred' => 0,
-                    'coin_address' => ''
-                ]
-            );
+            
 
             $botman->hears($request['message']['text'], function (BotMan $bot) use ($request) {
                 try {

@@ -5,12 +5,13 @@
     "keywords": ["framework", "laravel"],
     "license": "MIT",
     "require": {
-        "ext-pdo_sqlite": "*",
         "php": "^7.3|^8.0",
+        "ext-pdo_sqlite": "*",
         "botman/botman": "^2.6",
         "botman/driver-telegram": "^1.6",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
+        "greensea/keccak": "^1.0",
         "guzzlehttp/guzzle": "^7.0.1",
         "laravel/framework": "^8.40",
         "laravel/tinker": "^2.5"

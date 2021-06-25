@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "666869f834fd21b37c0f4606ec7f2dae",
+    "content-hash": "47f2d54abee676cc7329e7a698ac5776",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -809,6 +809,54 @@
                 }
             ],
             "time": "2020-04-13T13:17:36+00:00"
+        },
+        {
+            "name": "greensea/keccak",
+            "version": "1.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/greensea/php-keccak.git",
+                "reference": "75134808182adf6f3c04e90e20554d883e0c6ba4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/greensea/php-keccak/zipball/75134808182adf6f3c04e90e20554d883e0c6ba4",
+                "reference": "75134808182adf6f3c04e90e20554d883e0c6ba4",
+                "shasum": ""
+            },
+            "require": {
+                "ext-mbstring": "*",
+                "php": ">=7.0.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~7",
+                "satooshi/php-coveralls": "~2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "kornrunner\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "greensea",
+                    "homepage": "https://github.com/greensea/php-keccak"
+                }
+            ],
+            "description": "Pure PHP implementation of Keccak. Fork from kornrunner/php-keccak, support PHP 7.0",
+            "keywords": [
+                "keccak",
+                "sha-3"
+            ],
+            "support": {
+                "source": "https://github.com/greensea/php-keccak/tree/1.0.3"
+            },
+            "time": "2018-05-02T05:31:11+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -8119,8 +8167,8 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "ext-pdo_sqlite": "*",
-        "php": "^7.3|^8.0"
+        "php": "^7.3|^8.0",
+        "ext-pdo_sqlite": "*"
     },
     "platform-dev": [],
     "plugin-api-version": "2.1.0"

@@ -27,8 +27,13 @@ class TelegramController extends Controller
 
     public function __construct()
     {
+        $welcomeMsg = "Welcome
+        Reply with (button)[/start]";
         $messages = ([
-            'hi' => 'hello',
+            'hi' => $welcomeMsg,
+            'Hi' => $welcomeMsg,
+            'hello' => $welcomeMsg,
+            'Hello' => $welcomeMsg,
             '/start' => "
 Hello, {first_name}! I am your friendly Refract Airdrop bot
 
@@ -80,11 +85,11 @@ Submit Address ERC20 (Ethereum)
 
 You can find this wallet address at Binance and Trustwallet",
 
-            "0xDd5eDa67A50FAe4156DEE440Aa79675477caFC0e" => '
-\u{1f539}Join Advertiser Telegram Channel 
-\u{1f539}Follow Advertiser twitter , like and retweet airdrop post.
+            "wallet_address" => "
+\u{1f539} Join Advertiser Telegram Channel 
+\u{1f539} Follow Advertiser twitter , like and retweet airdrop post.
 
-Submit your retweeted link.',
+Submit your retweeted link.",
 
 "twitted_link" => "Thankyou {first_name} ! 
 
@@ -228,6 +233,10 @@ If your submitted data wrong then you can restart the bot and resubmit the data 
                     $messages = [$this->messages['twitted_link']];
                     $this->replyChat($messages, $bot, $user);
                     $this->updateTwitterLinkUrl($request, $twitterLink);
+                } elseif ((new EthereumValidator)->isAddress($str)) {
+                    $messages = [$this->messages['wallet_address']];
+                    $this->replyChat($messages, $bot, $user);
+                    $this->updateWalletAddress($request, $str);
                 } else {
                     $bot->reply($this->errorMessage);
                 }
@@ -244,6 +253,9 @@ If your submitted data wrong then you can restart the bot and resubmit the data 
     public function updateTwitterLinkUrl($request, $url)
     {
         return $this->getUser($request)->update(['twitter_link' => $url]);
+    }
+    public function updateWalletAddress($request, $address) {
+        return $this->getUser($request)->update(['coin_address' => $address]);
     }
     public function updateReferral($chat_id, $request)
     {

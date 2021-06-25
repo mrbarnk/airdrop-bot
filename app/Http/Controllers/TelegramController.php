@@ -142,7 +142,7 @@ ________________
         // Create an instance
         $botman = BotManFactory::create($config);
 
-        try {
+        // try {
             if (!$request['message']['chat']) {
                 return;
             }
@@ -154,9 +154,9 @@ ________________
             if ($first->count() == 0) {
                 Chats::create([
                 'chat_id' => $request['message']['chat']['id'],
-                'first_name' => $request['message']['chat']['first_name'],
-                'last_name' => $request['message']['chat']['last_name'],
-                'username' => $request['message']['chat']['username'],
+                'first_name' => $this->getArrayKey($request['message']['chat'], 'first_name'),
+                'last_name' => $this->getArrayKey($request['message']['chat'], 'last_name'),
+                'username' => $this->getArrayKey($request['message']['chat'], 'username'),
                 'referred_by' => '',
                 'twitter_link' => '',
                 'twitter_profile_link' => '',
@@ -165,15 +165,15 @@ ________________
             ]);
             } else {
                 Chats::where(['chat_id' => $request['message']['chat']['id']])->update([
-                'first_name' => $request['message']['chat']['first_name'],
-                'last_name' => $request['message']['chat']['last_name'],
-                'username' => $request['message']['chat']['username'],
+                'first_name' => $this->getArrayKey($request['message']['chat'], 'first_name'),
+                'last_name' => $this->getArrayKey($request['message']['chat'], 'last_name'),
+                'username' => $this->getArrayKey($request['message']['chat'], 'username'),
             ]);
-                // dd($request['message']['chat']['first_name']);
+                // dd($this->getArrayKey($request['message']['chat'], 'first_name'));
             }
-        } catch (\Throwable $th) {
-            //throw $th;
-        }
+        // } catch (\Throwable $th) {
+        //     //throw $th;
+        // }
         // Give the bot something to listen for.
         try {
             if (!$request['message']['text']) {
@@ -267,6 +267,14 @@ ________________
     public function updateTwitterProfileUrl($request, $url)
     {
         return $this->getUser($request)->update(['twitter_profile_link' => $url]);
+    }
+    public function getArrayKey($array, $key)
+    { 
+        try {
+            return $array[$key];
+        } catch (\Throwable $th) {
+            return "";
+        }
     }
     public function updateTwitterLinkUrl($request, $url)
     {

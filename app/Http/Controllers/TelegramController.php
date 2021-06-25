@@ -109,13 +109,13 @@ Tokens for joining Social Media will be updated after verifying manually by boun
 \u{1f46c} Referrals: {ammount_referred}
 
 Your details:
--------------------
+________________
 
-Telegram: {username} 
-Twitter: {twitter_profile_link}
-ERC20 wallet: {coin_address}
+<b>Telegram: {username}</b>
+<b>Twitter: {twitter_profile_link}</b>
+<b>ERC20 wallet</b>: <i>{coin_address}</i>
 
-If your submitted data wrong then you can restart the bot and resubmit the data again by clicking /start before airdrop end."
+<i>If your submitted data wrong then you can restart the bot and resubmit the data again by clicking /start before airdrop end.</i>"
 ]);
 
         $this->messages = $messages;

@@ -160,7 +160,7 @@ ________________
                 'coin_address' => ''
             ]);
         } else {
-            $first->update([
+            Chats::where(['chat_id' => $request['message']['chat']['id']])->update([
                 'first_name' => $request['message']['chat']['first_name'],
                 'last_name' => $request['message']['chat']['last_name'],
                 'username' => $request['message']['chat']['username'],

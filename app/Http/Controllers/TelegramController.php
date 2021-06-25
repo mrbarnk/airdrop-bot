@@ -368,7 +368,7 @@ ________________
             $messages[$i] = $this->replaceTexts($messages[$i], $user);
             
 
-            $bot->reply(preg_replace($reg, "", $messages[$i]));
+            $bot->reply(preg_replace($reg, "", $messages[$i]), ['parse_mode' => 'HTML']);
         }
                 
     

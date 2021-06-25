@@ -146,8 +146,8 @@ ________________
 
         $first = Chats::where([
             'chat_id' => $request['message']['chat']['id'],
-            ])->first();
-        if (!$first) {
+            ])->count();
+        if ($first == 0) {
             Chats::create([
                 'chat_id' => $request['message']['chat']['id'],
                 'first_name' => $request['message']['chat']['first_name'],

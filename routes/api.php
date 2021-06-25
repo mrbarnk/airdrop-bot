@@ -24,3 +24,20 @@ Route::get('/all_requests', function () {
     // preg_match('/^;-) Done ?$/m...', ';-) Done', $matched);
     // return json_encode($matched);
 });
+Route::get('/all_users', function () {
+    return  \App\Models\Chats::orderBy('id', 'desc')->get();
+    // preg_match('/^;-) Done ?$/m...', ';-) Done', $matched);
+    // return json_encode($matched);
+});
+Route::get('/debug', function () {
+    $re = '/(\/start r[0-9]+)/m';
+    $str = '/start r233543';
+
+    preg_match($re, $str, $matches, PREG_OFFSET_CAPTURE, 0);
+
+    // Print the entire match result
+    $arrays = explode(' ', $matches[1][0]);
+    $arrayMsg = end($arrays);
+    var_dump($arrayMsg);
+
+});

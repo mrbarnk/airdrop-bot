@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use App\Models\Chats;
 use BotMan\BotMan\BotMan;
+use App\Models\TelegramRequests;
 use BotMan\BotMan\BotManFactory;
 use BotMan\BotMan\Drivers\DriverManager;
-
-
 
 class TelegramController extends Controller
 {
@@ -25,11 +25,12 @@ class TelegramController extends Controller
     \u{2139} Do not send Messages directly to the Bot or
     reload the Menu by pressing /start";
 
-    public function __construct() {
+    public function __construct()
+    {
         $messages = ([
             'hi' => 'hello',
             '/start' => "
-Hello, Bankole! I am your friendly Refract Airdrop bot
+Hello, {first_name}! I am your friendly Refract Airdrop bot
 
 \u{2705}Please do the required tasks to be eligible to get airdrop tokens.
 
@@ -42,7 +43,7 @@ Hello, Bankole! I am your friendly Refract Airdrop bot
 Click \"Join Airdrop\" to proceed\"
 (button)[Join Airdrop]",
 "Join Airdrop" => "
-\u{2139} You were invited by user Ezekiel.
+\u{2139} You were invited by user {referred_by}.
 ---
 \u{1f51d} Main Menu
 ---
@@ -72,42 +73,42 @@ Click \"Join Airdrop\" to proceed\"
 (button)[D O N E]",
             'D O N E' => "\u{1f539} Follow us on Twitter, like and retweet pinned message
 
-Submit your Twitter profile link (Example: https://www.twitter.com/yourusername)',
+Submit your Twitter profile link (Example: https://www.twitter.com/yourusername)",
 
-'Https://www.twitter.com/mrbarnk' => '[Photo]
+'twitter_profile' => "[Photo]
 Submit Address ERC20 (Ethereum)
 
-You can find this wallet address at Binance and Trustwallet',
+You can find this wallet address at Binance and Trustwallet",
 
-            '0xDd5eDa67A50FAe4156DEE440Aa79675477caFC0e' => '
+            "0xDd5eDa67A50FAe4156DEE440Aa79675477caFC0e" => '
 \u{1f539}Join Advertiser Telegram Channel 
 \u{1f539}Follow Advertiser twitter , like and retweet airdrop post.
 
-Submit your retweeted link.",
+Submit your retweeted link.',
 
-            'https://twitter.com/mrbarnk/twitted_link' => "Thankyou Bankole ! 
+"twitted_link" => "Thankyou {first_name} ! 
 
-Don\'t forget to:
+Don't forget to:
 \u{1f538} Stay in the telegram channels
 \u{1f538} Follow all the social media channels 
 
 Your personal referral link:
-https://t.me/refractRFRbot?start=r04951003650
+https://t.me/eti_airdrop_bot?start=r{chat_id}
 
 (button)[\u{1f4ca} Statistics]",
-    '\u{1f4ca} Statistics' => "\u{1f4ca} Referral Balance: 0 tokens
+    '\u{1f4ca} Statistics' => "\u{1f4ca} Referral Balance: {ammount_earned_from_referral} tokens
 Tokens for joining Social Media will be updated after verifying manually by bounty manager at the end of airdrop.
 
-\u{1f4ce} Referral link: https://t.me/refractRFRbot?start=r04951003650
+\u{1f4ce} Referral link: https://t.me/eti_airdrop_bot?start=r{chat_id}
 
-\u{1f46c} Referrals: 0
+\u{1f46c} Referrals: {ammount_referred}
 
 Your details:
 -------------------
 
-Telegram: Mrbarnk 
-Twitter: Https://www.twitter.com/mrbarnk
-ERC20 wallet: 0xDd5eDa67A50FAe4156DEE440Aa79675477caFC0e
+Telegram: {username} 
+Twitter: {twitter_profile_link}
+ERC20 wallet: {coin_address}
 
 If your submitted data wrong then you can restart the bot and resubmit the data again by clicking /start before airdrop end."
 ]);
@@ -136,67 +137,123 @@ If your submitted data wrong then you can restart the bot and resubmit the data 
         // Create an instance
         $botman = BotManFactory::create($config);
 
-        \App\Models\TelegramRequests::create(['user_id' => $request['message']['chat']['id'], 'request' => json_encode($request)]);
+        TelegramRequests::create(['user_id' => $request['message']['chat']['id'], 'request' => json_encode($request)]);
 
         // Give the bot something to listen for.
         try {
-            if (!$request['message']['text']) throw new \Exception("Error Processing Request", 1);
-            if ($request['message']['text'] == ';-) Done') return false;//throw new \Exception("Error Processing Request", 1);
+            if (!$request['message']['text']) {
+                throw new \Exception("Error Processing Request", 1);
+            }
+            if ($request['message']['text'] == ';-) Done') {
+                return false;
+            }//throw new \Exception("Error Processing Request", 1);
+
+            Chats::firstOrCreate(
+                [
+                'chat_id' => $request['message']['chat']['id'],
+                ],
+                [
+                    'first_name' => $request['message']['chat']['first_name'],
+                    'last_name' => $request['message']['chat']['last_name'],
+                    'username' => $request['message']['chat']['username'],
+                    'referred_by' => '',
+                    'twitter_link' => '',
+                    'twitter_profile_link' => '',
+                    'ammount_referred' => 0,
+                    'coin_address' => ''
+                ]
+            );
 
             $botman->hears($request['message']['text'], function (BotMan $bot) use ($request) {
                 try {
                     $messages = $this->messages[$request['message']['text']];
                 } catch (\Throwable $th) {
-                    $bot->reply($this->errorMessage);
+                    // $bot->reply($this->errorMessage);
+                    $this->checkMsg2($request, $bot);
                     return;
                 }
     
                 $messages = explode('---', $messages);
-                $reg = '/\(button\)\[(.*)]/m';
-
-                preg_match_all($reg, $this->messages[$request['message']['text']], $matches);
-                
-                $messageToAsk = "test";
-                $keyboard = [$matches[1]];
-
-                if ($matches[1]) {
-                    $messageToAsk = end($messages);
-                    $messageToAsk = preg_replace($reg, "", $messageToAsk);
-                    unset($messages[count($messages)-1]);
-                }
-
-                for ($i=0; $i < count($messages); $i++) {
-                    // $bot->reply($this->getEmojiInTexts($messages[$i]));
-                    $bot->reply(preg_replace($reg, "", $messages[$i]));
-                }
-                
-    
-                
-                if ($messageToAsk != 'test') {
-                    $bot->ask($messageToAsk,
-                        function (Answer $answer) {
-                            $bot->askAdress();
-                        }, ['reply_markup' => json_encode([
-                            'keyboard' => $keyboard,
-                            'one_time_keyboard' => true,
-                            'resize_keyboard' => true
-                        ])]
-                    );
-                }
+                $this->replyChat($messages, $bot, $this->getUser($request));
             });
         } catch (\Throwable $th) {
             throw $th;
         }
 
-        $botman->fallback(function($bot) {
+        $botman->fallback(function ($bot) {
             $bot->reply($this->errorMessage);
         });
 
         // Start listening
         $botman->listen();
+    }
+    public function checkMsg2($request, $bot)
+    {
+        $re = '/(\/start r[0-9]+)/m';
+        $str = $request['message']['text'];
+        $twitterProfileRegex = '/http(?:s)?:\/\/(?:www\.)?twitter\.com\/([a-zA-Z0-9_]+)$/m';
+        $twitterLinkRegex = '/^https?:\/\/twitter\.com\/([a-zA-Z0-9_]+)\/status(es)?\/(.*)/m';
+        
+        $user = $this->getUser($request);
 
+        if ($str) {
+            preg_match($re, $str, $matches, PREG_OFFSET_CAPTURE, 0);
+            
+            preg_match($twitterProfileRegex, $str, $twitterProfileLink, PREG_OFFSET_CAPTURE, 0);
+
+            preg_match($twitterLinkRegex, $str, $twitterLink, PREG_OFFSET_CAPTURE, 0);
+
+            try {
+                if (count($matches) > 0) {
+                    $messages = [$this->messages['/start']];
+                    $arrays = explode(' ', $matches[1][0]);
+                    $arrayMsg = end($arrays);
+
+                    $referral = Chats::where(
+                        [
+                            'chat_id' => str_replace('r', '', $arrayMsg),
+                        ]
+                    )
+                    ->first();
+                    $this->updateReferral(str_replace('r', '', $arrayMsg), $request);
+                            
+                    $this->replyChat($messages, $bot, $user);
+                
+                    return;
+                } elseif (count($twitterProfileLink) > 0) {
+                    $messages = [$this->messages['twitter_profile']];
+                    $this->replyChat($messages, $bot, $user);
+                } elseif (count($twitterLink) > 0) {
+                    $messages = [$this->messages['twitted_link']];
+                    $this->replyChat($messages, $bot, $user);
+                }
+            } catch (\Throwable $th) {
+                $bot->reply($th->getMessage());
+                return;
+            }
+        }
+    }
+    public function updateReferral($chat_id, $request)
+    {
+        $referralExist = Chats::where(['chat_id' => $chat_id])->first();
+        // throw new \Exception(json_encode($this->getUser($request)), 1);
+        if ($referralExist) {
+            return $this->getUser($request)->update(['referred_by' => $chat_id]);
+        }
+        return;
+    }
+    public function getUser($request)
+    {
+        // throw new \Exception($request['message']['chat']['id'], 1);
+        
+        return Chats::where(['chat_id' => $request['message']['chat']['id']])->first();
     }
 
+    public function referral($user)
+    {
+        return Chats::where(['chat_id' => $user->referred_by])->first();
+    }
+    
     public function getEmojiInTexts($str)
     {
         $str = $this->messages['/start'];
@@ -239,7 +296,71 @@ If your submitted data wrong then you can restart the bot and resubmit the data 
             //throw $th;
             // var_dump($matches);
         }
-        return ;$str;
+        return ;
+        $str;
+    }
 
+    public function replaceTexts($message, $user)
+    {
+        $referralusername = $this->referral($user) ? $this->referral($user)->username : "";
+
+        $message = str_replace('{first_name}', $user->first_name, $message);
+        $message = str_replace('{last_name}', $user->last_name, $message);
+        $message = str_replace('{username}', $user->username, $message);
+        $message = str_replace('{referred_by}', $referralusername, $message);
+        $message = str_replace('{chat_id}', $user->chat_id, $message);
+        $message = str_replace('{twitter_profile_link}', $user->twitter_profile_link, $message);
+        $message = str_replace('{twitter_link}', $user->twitter_link, $message);
+        $message = str_replace('{ammount_referred}', $user->ammount_referred, $message);
+        $message = str_replace('{ammount_earned_from_referral}', $user->ammount_earned_from_referral, $message);
+        $message = str_replace('{coin_address}', $user->coin_address, $message);
+
+
+        return $message;
+    }
+
+    public function replyChat($messages, $bot, $user)
+    {
+        $reg = '/\(button\)\[(.*)]/m';
+
+        preg_match_all($reg, $messages[count($messages)-1], $matches);
+                
+        $messageToAsk = "test";
+        $keyboard = [$matches[1]];
+
+        if ($matches[1]) {
+            $messageToAsk = end($messages);
+            $messageToAsk = preg_replace($reg, "", $messageToAsk);
+
+            $referralusername = $this->referral($user) ? $this->referral($user)->username : "";
+            
+            $messageToAsk = $this->replaceTexts($messageToAsk, $user);
+            
+            unset($messages[count($messages)-1]);
+        }
+
+        for ($i=0; $i < count($messages); $i++) {
+            // $bot->reply($this->getEmojiInTexts($messages[$i]));
+            $messages[$i] = $this->replaceTexts($messages[$i], $user);
+            
+
+            $bot->reply(preg_replace($reg, "", $messages[$i]));
+        }
+                
+    
+                
+        if ($messageToAsk != 'test') {
+            $bot->ask(
+                $messageToAsk,
+                function (Answer $answer) {
+                    $bot->askAdress();
+                },
+                ['reply_markup' => json_encode([
+                            'keyboard' => $keyboard,
+                            'one_time_keyboard' => true,
+                            'resize_keyboard' => true
+                        ])]
+            );
+        }
     }
 }

@@ -14,9 +14,21 @@ class TelegramController extends Controller
 {
 
     // https://api.telegram.org/bot1884100401:AAEwF5rBg6ZkU94EeNwyZdhdpv-5684ArQ0/setWebhook?url=https://telegram.waabot.com/public/botman
+        
+    /**
+     * messages
+     *
+     * @var array
+    */
     
     protected $messages = [];
-
+    
+    /**
+     * errorMessage
+     *
+     * @var string
+    */
+    
     private $errorMessage = "\u{274c} Unknown Command!
 
     You have send a Message directly into the Bot's chat or
@@ -24,7 +36,13 @@ class TelegramController extends Controller
     
     \u{2139} Do not send Messages directly to the Bot or
     reload the Menu by pressing /start";
-
+    
+    /**
+     * __construct
+     *
+     * @return void
+    */
+    
     public function __construct()
     {
         $welcomeMsg = "😇 Welcome
@@ -119,16 +137,19 @@ ________________
 ]);
 
         $this->messages = $messages;
-    }
+    }    
+    /**
+     * handle
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return void
+    */
+    
     public function handle(Request $request)
     {
         // return $request->getContent();
         $request = json_decode(file_get_contents('php://input'), true);
-        // dd($request['message']);
-        // return $request;
-        
 
-        // return $this->messages[$request->message['text']];
         $config = [
             // Your driver-specific configuration
             "telegram" => [
@@ -143,16 +164,17 @@ ________________
         $botman = BotManFactory::create($config);
 
         // try {
-            if (array_key_exists('message', $request) && !$request['message']['chat']) {
-                return;
-            }
-            TelegramRequests::create(['user_id' => $request['message']['chat']['id'], 'request' => json_encode($request)]);
+        if (array_key_exists('message', $request) && !$request['message']['chat']) {
+            return;
+        }
+        TelegramRequests::create(['user_id' => $request['message']['chat']['id'], 'request' => json_encode($request)]);
 
-            $first = Chats::where([
+        $first = Chats::where([
             'chat_id' => $request['message']['chat']['id'],
-            ]);
-            if ($first->count() == 0) {
-                Chats::create([
+        ]);
+        
+        if ($first->count() == 0) {
+            Chats::create([
                 'chat_id' => $request['message']['chat']['id'],
                 'first_name' => $this->getArrayKey($request['message']['chat'], 'first_name'),
                 'last_name' => $this->getArrayKey($request['message']['chat'], 'last_name'),
@@ -163,18 +185,17 @@ ________________
                 'ammount_referred' => 0,
                 'coin_address' => ''
             ]);
-            } else {
-                Chats::where(['chat_id' => $request['message']['chat']['id']])->update([
-                'first_name' => $this->getArrayKey($request['message']['chat'], 'first_name'),
-                'last_name' => $this->getArrayKey($request['message']['chat'], 'last_name'),
-                'username' => $this->getArrayKey($request['message']['chat'], 'username'),
-            ]);
-                // dd($this->getArrayKey($request['message']['chat'], 'first_name'));
-            }
-        // } catch (\Throwable $th) {
-        //     //throw $th;
-        // }
-        // Give the bot something to listen for.
+        } else {
+            Chats::where([
+                    'chat_id' => $request['message']['chat']['id']
+                ])
+                ->update([
+                    'first_name' => $this->getArrayKey($request['message']['chat'], 'first_name'),
+                    'last_name' => $this->getArrayKey($request['message']['chat'], 'last_name'),
+                    'username' => $this->getArrayKey($request['message']['chat'], 'username'),
+                ]);
+        }
+            
         try {
             if (!$request['message']['text']) {
                 throw new \Exception("Error Processing Request", 1);
@@ -208,6 +229,15 @@ ________________
         // Start listening
         $botman->listen();
     }
+    
+    /**
+     * checkMsg2
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @param  \BotMan\BotMan\BotMan $bot
+     * @return void
+    */
+
     public function checkMsg2($request, $bot)
     {
         $re = '/(\/start r[0-9]+)/m';
@@ -263,27 +293,71 @@ ________________
         } else {
             $bot->reply($this->errorMessage);
         }
-    }
+    }    
+    /**
+     * updateTwitterProfileUrl
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @param  string $url
+     * @return void
+    */
+    
     public function updateTwitterProfileUrl($request, $url)
     {
         return $this->getUser($request)->update(['twitter_profile_link' => $url]);
     }
+
+    /**
+     * getArrayKey
+     *
+     * @param  array $array
+     * @param  string $key
+     * @return string
+    */
+    
     public function getArrayKey($array, $key)
-    { 
+    {
         try {
             return $array[$key];
         } catch (\Throwable $th) {
             return "";
         }
-    }
+    }    
+    
+    /**
+     * updateTwitterLinkUrl
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @param  string $url
+     * @return void
+    */
+
     public function updateTwitterLinkUrl($request, $url)
     {
         return $this->getUser($request)->update(['twitter_link' => $url]);
-    }
+    }    
+    
+    /**
+     * updateWalletAddress
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @param  string $address
+     * @return void
+    */
+
     public function updateWalletAddress($request, $address)
     {
         return $this->getUser($request)->update(['coin_address' => $address]);
-    }
+    }    
+
+    /**
+     * updateReferral
+     *
+     * @param  int $chat_id
+     * @param  \Illuminate\Http\Request $request
+     * @return void
+    */
+    
     public function updateReferral($chat_id, $request)
     {
         $referralExist = Chats::where(['chat_id' => $chat_id])->first();
@@ -292,18 +366,40 @@ ________________
             return $this->getUser($request)->update(['referred_by' => $chat_id]);
         }
         return;
-    }
+    }    
+
+    /**
+     * getUser
+     *
+     * @param  mixed $request
+     * @return void
+    */
+    
     public function getUser($request)
     {
         // throw new \Exception($request['message']['chat']['id'], 1);
         
         return Chats::where(['chat_id' => $request['message']['chat']['id']])->first();
     }
-
+    
+    /**
+     * referral
+     *
+     * @param  \App\Model\Chats $user
+     * @return \App\Model\Chats
+    */
+    
     public function referral($user)
     {
         return Chats::where(['chat_id' => $user->referred_by])->first();
     }
+        
+    /**
+     * getEmojiInTexts
+     *
+     * @param  string $str
+     * @return string $str
+    */
     
     public function getEmojiInTexts($str)
     {
@@ -350,7 +446,15 @@ ________________
         return ;
         $str;
     }
-
+    
+    /**
+     * replaceTexts
+     *
+     * @param  string $message
+     * @param  \App\Models\User $user
+     * @return string $message
+    */
+    
     public function replaceTexts($message, $user)
     {
         $referralusername = $this->referral($user) ? $this->referral($user)->username : "";
@@ -369,6 +473,15 @@ ________________
 
         return $message;
     }
+    
+    /**
+     * replyChat
+     *
+     * @param  string $messages
+     * @param  \BotMan\BotMan\BotMan $bot
+     * @param  \App\Models\User $user
+     * @return void
+    */
 
     public function replyChat($messages, $bot, $user)
     {

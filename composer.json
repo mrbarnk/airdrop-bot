@@ -14,7 +14,8 @@
         "greensea/keccak": "^1.0",
         "guzzlehttp/guzzle": "^7.0.1",
         "laravel/framework": "^8.40",
-        "laravel/tinker": "^2.5"
+        "laravel/tinker": "^2.5",
+        "laravel/ui": "^3.0"
     },
     "require-dev": {
         "facade/ignition": "^2.5",
@@ -29,7 +30,10 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "files": [
+            "app/Helpers/Helper.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
